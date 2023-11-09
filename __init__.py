@@ -143,6 +143,69 @@ class OFFSEGSToImage:
             results.append(empty_pil_tensor())
 
         return (results[0],)
+    
+class OFFCenterCropSEGS:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                "segs": ("SEGS", ),
+                "image": ("IMAGE",)
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "doit"
+
+    CATEGORY = "OFF"
+
+    def doit(self, segs, image=None):
+        results = list()
+        image = tensor2pil(image)
+        img_width, img_height = image.size
+
+        crop_size = img_width
+        if img_width > img_height:
+            crop_size = img_height
+            
+        for seg in segs[1]:
+            
+            if seg.cropped_image is not None:
+                center_x = (seg.crop_region[0] + seg.crop_region[2])/2
+                center_y = (seg.crop_region[1] + seg.crop_region[3])/2
+
+                crop_top = center_y  - crop_size/2
+                crop_left = center_x - crop_size/2
+                crop_bottom = center_y + crop_size/2
+                crop_right = center_x + crop_size/2
+
+                if crop_top < 0:
+                    crop_bottom = crop_bottom - crop_top
+                    crop_top = 0
+                if crop_left < 0:
+                    crop_right = crop_right - crop_left
+                    crop_left = 0
+
+                if crop_bottom > img_height:
+                    crop_top = crop_top - (crop_bottom - img_height)
+                    crop_bottom = img_height
+                if crop_right > img_width:
+                    crop_left = crop_left - (crop_right - img_width)
+                    crop_right = img_width
+
+                cropped_image = image.crop(
+                    (crop_left, crop_top, crop_right, crop_bottom))
+                cropped_image = cropped_image.resize(
+                    (((cropped_image.size[0] // 8) * 8), ((cropped_image.size[1] // 8) * 8)))
+                cropped_image = pil2tensor(cropped_image)
+            else:
+                cropped_image = empty_pil_tensor()
+
+            results.append(cropped_image)
+
+        if len(results) == 0:
+            results.append(empty_pil_tensor())
+
+        return (results[0],)
 
 class GWNumFormatter:
 
@@ -185,6 +248,7 @@ class GWNumFormatter:
 NODE_CLASS_MAPPINGS = {
     "Image Crop Fit": OFFCenterCrop,
     "OFF SEGS to Image": OFFSEGSToImage,
+    "Crop Center wigh SEGS" : OFFCenterCropSEGS,
     "GW Number Formatting": GWNumFormatter
 }
 
@@ -192,5 +256,7 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "Image Crop Fit": "Image Crop Fit Node",
     "OFF SEGS to Image": "OFF SEGS to Image",
+    "Crop Center wigh SEGS":"Crop Center wigh SEGS",
     "GW Number Formatting": "GW Number Formatting Node"
+
 }
