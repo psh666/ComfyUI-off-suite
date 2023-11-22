@@ -207,6 +207,35 @@ class OFFCenterCropSEGS:
 
         return (results[0],)
 
+class OFFWatermark:
+    def __init__(self):
+        pass
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required":{
+                "source":("IMAGE",),
+                "watermark":("IMAGE",)
+            }
+        }
+    
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "doit"
+
+    CATEGORY = "OFF"
+
+    def doit(self, source, watermark):
+        source_image = tensor2pil(source)
+        watermark_image = tensor2pil(watermark).convert()
+
+        watermark_ratio = watermark_image.height/ watermark_image.width
+        new_wm_with = source_image.width*0.15
+        watermark_image = watermark_image.resize((int(new_wm_with), int(new_wm_with*watermark_ratio)))
+        source_image.paste(watermark_image,(10,10), watermark_image)
+            
+        return (pil2tensor(source_image),)
+
+
 class GWNumFormatter:
 
     def __init__(self):
@@ -249,6 +278,7 @@ NODE_CLASS_MAPPINGS = {
     "Image Crop Fit": OFFCenterCrop,
     "OFF SEGS to Image": OFFSEGSToImage,
     "Crop Center wigh SEGS" : OFFCenterCropSEGS,
+    "Watermarking" : OFFWatermark,
     "GW Number Formatting": GWNumFormatter
 }
 
@@ -257,6 +287,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Image Crop Fit": "Image Crop Fit Node",
     "OFF SEGS to Image": "OFF SEGS to Image",
     "Crop Center wigh SEGS":"Crop Center wigh SEGS",
+    "Watermarking" : "Watermarking",
     "GW Number Formatting": "GW Number Formatting Node"
 
 }
