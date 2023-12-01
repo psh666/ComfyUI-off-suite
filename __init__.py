@@ -35,6 +35,45 @@ def empty_pil_tensor(w=64, h=64):
     return pil2tensor(image)
 
 
+class OFFImageResizeFit:
+    def __init__(self):
+        pass
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required":{
+                "image":("IMAGE",)
+            },
+            "optional":{
+                "size":("INT",{
+                    "default": 512,
+                })
+            }
+        }
+    
+    RETURN_TYPES = ("IMAGE",)
+
+    FUNCTION = "doit"
+    CATEGORY = "OFF"
+
+    def doit(self, image, size=512):
+        image = tensor2pil(image)
+        new_width = size
+        new_height = size
+        ratio = float(image.width) / float(image.height)
+        
+        if image.width > image.height :
+            new_width = int(size* ratio)
+        else:
+            new_height = int(size/ratio)
+
+    
+        image = image.resize((new_width, new_height))
+
+        return (pil2tensor(image),)
+
+
+
 class OFFCenterCrop:
 
     def __init__(self):
@@ -275,6 +314,7 @@ class GWNumFormatter:
 # A dictionary that contains all nodes you want to export with their names
 # NOTE: names should be globally unique
 NODE_CLASS_MAPPINGS = {
+    "Image Resize Fit":OFFImageResizeFit,
     "Image Crop Fit": OFFCenterCrop,
     "OFF SEGS to Image": OFFSEGSToImage,
     "Crop Center wigh SEGS" : OFFCenterCropSEGS,
@@ -284,6 +324,7 @@ NODE_CLASS_MAPPINGS = {
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
 NODE_DISPLAY_NAME_MAPPINGS = {
+    "Image Resize Fit" : "Image Resize Fit",
     "Image Crop Fit": "Image Crop Fit Node",
     "OFF SEGS to Image": "OFF SEGS to Image",
     "Crop Center wigh SEGS":"Crop Center wigh SEGS",
