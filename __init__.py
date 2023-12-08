@@ -2,6 +2,8 @@ import numpy as np
 from PIL import Image, ImageDraw
 import torch
 
+from .modules import imageloader
+
 
 def tensor2pil(image):
     return Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
@@ -319,7 +321,8 @@ NODE_CLASS_MAPPINGS = {
     "OFF SEGS to Image": OFFSEGSToImage,
     "Crop Center wigh SEGS" : OFFCenterCropSEGS,
     "Watermarking" : OFFWatermark,
-    "GW Number Formatting": GWNumFormatter
+    "GW Number Formatting": GWNumFormatter,
+    "Cached Image Load From URL": imageloader.CachedLoadImageFromUrl
 }
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
@@ -329,6 +332,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "OFF SEGS to Image": "OFF SEGS to Image",
     "Crop Center wigh SEGS":"Crop Center wigh SEGS",
     "Watermarking" : "Watermarking",
-    "GW Number Formatting": "GW Number Formatting Node"
+    "GW Number Formatting": "GW Number Formatting Node",
+    "Cached Image Load From URL": "Cached Image Load From URL"
 
 }
