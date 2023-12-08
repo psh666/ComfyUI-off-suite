@@ -10,6 +10,7 @@ NODE_CLASS_MAPPINGS = {
     "Image Crop Fit": OFFCenterCrop,
     "OFF SEGS to Image": OFFSEGSToImage,
     "Crop Center with SEGS" : OFFCenterCropSEGS,
+    "Crop Center wigh SEGS": OFFCenterCropSEGS,
     "Watermarking" : OFFWatermark,
     "GW Number Formatting": GWNumFormatter,
     "Cached Image Load From URL": CachedLoadImageFromUrl
@@ -21,6 +22,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Image Crop Fit": "Image Crop Fit Node",
     "OFF SEGS to Image": "OFF SEGS to Image",
     "Crop Center with SEGS":"Crop Center with SEGS",
+    "Crop Center wigh SEGS": "DONT USE THIS",
     "Watermarking" : "Watermarking",
     "GW Number Formatting": "GW Number Formatting Node",
     "Cached Image Load From URL": "Cached Image Load From URL"
