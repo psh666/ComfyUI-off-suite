@@ -13,14 +13,12 @@ from typing import List, Dict, Tuple
 from PIL import Image, ImageOps, ImageFilter
 import numpy as np
 
+from .util import pil2tensor
+
 import folder_paths
 
 
 MAX_RESOLUTION = 8192
-
-def pil2tensor(image):
-    return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
-
 
 def prepare_image_for_preview(image: Image.Image, output_dir: str, prefix=None):
     if prefix is None:
