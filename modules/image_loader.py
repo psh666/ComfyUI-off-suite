@@ -74,9 +74,12 @@ def cached_image_load_from_url(url: str):
     elif response.status_code == 200:
       file_path = os.path.join(cache_path,url_hash)
       with open(file_path,"wb") as f:
-        f.write(response.content)
-      cache_metadata[url_hash] = response.headers['ETag']
-      print(response.headers['Etag'])
+        f.write(response.content) 
+      if 'Etag' not in response.headers:
+        cache_metadata[url_hash] = ''
+      else:
+        cache_metadata[url_hash] = response.headers['ETag']
+        print(response.headers['Etag'])
     else:
       raise Exception(response.text)
 
