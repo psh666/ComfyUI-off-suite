@@ -1,6 +1,7 @@
 from .modules.image_loader import CachedLoadImageFromUrl
 from .modules.image_tool import OFFCenterCrop, OFFCenterCropSEGS, OFFSEGSToImage, OFFImageResizeFit, OFFWatermark
 from .modules.misc import GWNumFormatter
+from .modules.latent_tool import VAEEncodeForInpaintV2
 
 
 # A dictionary that contains all nodes you want to export with their names
@@ -13,7 +14,8 @@ NODE_CLASS_MAPPINGS = {
     "Crop Center wigh SEGS": OFFCenterCropSEGS,
     "Watermarking" : OFFWatermark,
     "GW Number Formatting": GWNumFormatter,
-    "Cached Image Load From URL": CachedLoadImageFromUrl
+    "Cached Image Load From URL": CachedLoadImageFromUrl,
+    "VAE Encode For Inpaint V2" : VAEEncodeForInpaintV2
 }
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
@@ -25,6 +27,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Crop Center wigh SEGS": "DONT USE THIS",
     "Watermarking" : "Watermarking",
     "GW Number Formatting": "GW Number Formatting Node",
-    "Cached Image Load From URL": "Cached Image Load From URL"
+    "Cached Image Load From URL": "Cached Image Load From URL",
+    "VAE Encode For Inpaint V2" : "VAE Encode For Inpaint V2"
 
 }
