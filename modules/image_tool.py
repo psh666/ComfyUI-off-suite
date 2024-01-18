@@ -1,6 +1,9 @@
 
 import torch
+import math
+import numpy as np
 from .util import tensor2pil, pil2tensor, empty_pil_tensor, crop_image
+import cv2
 
 class OFFImageResizeFit:
     def __init__(self):
@@ -263,3 +266,58 @@ class MaskToImageFallback:
             zero_tensor = torch.zeros_like(image)
             result = zero_tensor
         return (result,)
+    
+
+
+def dilate_mask(mask, dilation_factor, iter=1):
+    if dilation_factor == 0:
+        return mask
+
+    kernel = np.ones((abs(dilation_factor), abs(dilation_factor)), np.uint8)
+    mask = cv2.UMat(mask)
+    kernel = cv2.UMat(kernel)
+
+    result = cv2.erode(mask, kernel, iter)
+
+    return result.get()
+    
+
+class MaskDilationForEachFace:
+    @classmethod
+    def INPUT_TYPES(s):
+        return{
+            "required": {
+                    "mask": ("MASK",),
+                    "segs": ("SEGS",),
+                    "dilation_factor": ("FLOAT",{"min": 0.0, "max": 10.0, "step": 0.1, "default": 1.0})
+                }
+        }
+    CATEGORY = "OFF"
+
+    RETURN_TYPES = ("MASK",)
+    FUNCTION = "process"
+
+    def process(self, mask, segs, dilation_factor):
+        assert(mask.shape[0] == len(segs[1]))
+        mask = mask.clone()
+        for i in range(0, mask.shape[0]):
+            
+            crop_mask = torch.zeros_like(mask[i])
+
+            crop_left = segs[1][i].crop_region[0]
+            crop_right = segs[1][i].crop_region[2]
+            crop_top = segs[1][i].crop_region[1]
+            crop_bottom = segs[1][i].crop_region[3]
+
+            crop_mask[:,segs[1][i].crop_region[1]:segs[1][i].crop_region[3] , segs[1][i].crop_region[0]:segs[1][i].crop_region[2]] = 255
+            pixel_count = (crop_right - crop_left) * (crop_bottom - crop_top)
+            dilation = int(math.sqrt(pixel_count)/3.0/25.0 * dilation_factor)
+            print(f"face {i} : pixel_count , dilation =  ", pixel_count, dilation)
+            mask[i] = mask[i] * crop_mask
+
+            cv_mask = mask[i].squeeze(0).numpy()
+            cv_mask = dilate_mask(cv_mask, dilation_factor=dilation)
+            mask[i] = torch.from_numpy(cv_mask).unsqueeze(0)
+
+        return (mask,)
+    

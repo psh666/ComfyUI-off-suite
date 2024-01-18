@@ -1,5 +1,5 @@
 from .modules.image_loader import CachedLoadImageFromUrl
-from .modules.image_tool import OFFCenterCrop, OFFCenterCropSEGS, OFFSEGSToImage, OFFImageResizeFit, OFFWatermark, MaskToImageFallback
+from .modules.image_tool import OFFCenterCrop, OFFCenterCropSEGS, OFFSEGSToImage, OFFImageResizeFit, OFFWatermark, MaskToImageFallback, MaskDilationForEachFace
 from .modules.misc import GWNumFormatter, QueryGenderAge
 from .modules.latent_tool import VAEEncodeForInpaintV2
 
@@ -18,6 +18,7 @@ NODE_CLASS_MAPPINGS = {
     "VAE Encode For Inpaint V2" : VAEEncodeForInpaintV2, 
     "Query Gender and Age" : QueryGenderAge,
     "Safe Mask to Image" : MaskToImageFallback,
+    "Dilate Mask for Each Face": MaskDilationForEachFace, 
 }
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
@@ -33,4 +34,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VAE Encode For Inpaint V2" : "VAE Encode For Inpaint V2",
     "Query Gender and Age" : "Query Gender and Age" ,
     "Safe Mask to Image" : "Safe Mask to Image",
+    "Dilate Mask for Each Face": "Dilate Mask for Each Face", 
 }
