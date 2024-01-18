@@ -1,6 +1,6 @@
 from .modules.image_loader import CachedLoadImageFromUrl
-from .modules.image_tool import OFFCenterCrop, OFFCenterCropSEGS, OFFSEGSToImage, OFFImageResizeFit, OFFWatermark
-from .modules.misc import GWNumFormatter
+from .modules.image_tool import OFFCenterCrop, OFFCenterCropSEGS, OFFSEGSToImage, OFFImageResizeFit, OFFWatermark, MaskToImageFallback
+from .modules.misc import GWNumFormatter, QueryGenderAge
 from .modules.latent_tool import VAEEncodeForInpaintV2
 
 
@@ -15,7 +15,9 @@ NODE_CLASS_MAPPINGS = {
     "Watermarking" : OFFWatermark,
     "GW Number Formatting": GWNumFormatter,
     "Cached Image Load From URL": CachedLoadImageFromUrl,
-    "VAE Encode For Inpaint V2" : VAEEncodeForInpaintV2
+    "VAE Encode For Inpaint V2" : VAEEncodeForInpaintV2, 
+    "Query Gender and Age" : QueryGenderAge,
+    "Safe Mask to Image" : MaskToImageFallback,
 }
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
@@ -28,6 +30,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Watermarking" : "Watermarking",
     "GW Number Formatting": "GW Number Formatting Node",
     "Cached Image Load From URL": "Cached Image Load From URL",
-    "VAE Encode For Inpaint V2" : "VAE Encode For Inpaint V2"
-
+    "VAE Encode For Inpaint V2" : "VAE Encode For Inpaint V2",
+    "Query Gender and Age" : "Query Gender and Age" ,
+    "Safe Mask to Image" : "Safe Mask to Image",
 }

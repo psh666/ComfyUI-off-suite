@@ -240,3 +240,26 @@ class OFFWatermark:
         source_image.paste(watermark_image,(10,10), watermark_image)
             
         return (pil2tensor(source_image),)
+
+class MaskToImageFallback:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+                "required": {
+                    "mask": ("MASK",),
+                    "image": ("IMAGE",),
+                }
+        }
+
+    CATEGORY = "OFF"
+
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "mask_to_image"
+
+    def mask_to_image(self, mask, image):
+        if mask is not None:
+            result = mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])).movedim(1, -1).expand(-1, -1, -1, 3)
+        else:
+            zero_tensor = torch.zeros_like(image)
+            result = zero_tensor
+        return (result,)
