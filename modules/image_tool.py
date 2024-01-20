@@ -320,4 +320,39 @@ class MaskDilationForEachFace:
             mask[i] = torch.from_numpy(cv_mask).unsqueeze(0)
 
         return (mask,)
+
+class SegsToFaceCropData:
+    @classmethod
+    def INPUT_TYPES(s):
+        return{
+            "required":{
+                "segs":("SEGS",),
+                "face_index":("INT", {"min":0, "default":0}),
+            }
+        }
+    CATEGORY = "OFF"
+    RETURN_TYPES = ("IMAGE","CROP_DATA",)
+    FUNCTION ="process"
+
+    def process(self, segs, face_index):
+        return (segs[1][face_index].cropped_image, segs[1][face_index].crop_region,)
+
+class PasteFaceSegToImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required":{
+                "orig_image":("IMAGE",),
+                "crop_image":("IMAGE",),
+                "crop_data":("CROP_DATA",),
+            }
+        }
+    
+    CATEGORY = "OFF"
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "process"
+
+    def process(self, orig_image, crop_image, crop_data):
+        orig_image[:,crop_data[1]: crop_data[1]+crop_image.shape[1], crop_data[0]:crop_data[0]+crop_image.shape[2],:] = crop_image
+        return (orig_image,)
     
