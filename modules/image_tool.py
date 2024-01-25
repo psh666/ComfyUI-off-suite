@@ -298,7 +298,9 @@ class MaskDilationForEachFace:
     FUNCTION = "process"
 
     def process(self, mask, segs, dilation_factor):
-        assert(mask.shape[0] == len(segs[1]))
+        if mask.shape[0] is not len(segs[1]):
+            return (mask,) 
+        
         mask = mask.clone()
         for i in range(0, mask.shape[0]):
             
