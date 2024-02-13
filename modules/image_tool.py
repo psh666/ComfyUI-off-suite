@@ -2,6 +2,7 @@
 import torch
 import math
 import numpy as np
+from PIL import Image
 from .util import tensor2pil, pil2tensor, empty_pil_tensor, crop_image
 import cv2
 
@@ -358,3 +359,38 @@ class PasteFaceSegToImage:
         orig_image[:,crop_data[1]: crop_data[1]+crop_image.shape[1], crop_data[0]:crop_data[0]+crop_image.shape[2],:] = crop_image
         return (orig_image,)
     
+class OFFCLAHE:
+    @classmethod
+    def INPUT_TYPES(s):
+        return{
+            "required":{
+                "image":("IMAGE",),
+                "clip_limit":("FLOAT",{"default":1.2}),
+                "grid_size":("INT",{"min":1, "default":8})
+            }
+        }
+    
+    CATEGORY =  "OFF"
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "process"
+
+    def process(self, image, clip_limit, grid_size):
+        
+        batch_size, height, width, _ = image.shape
+        result = torch.zeros_like(image)
+
+        for i in range(batch_size):
+            tensor_image = image[i].numpy()
+            source_image = np.array(Image.fromarray((tensor_image*255).astype(np.uint8)))
+
+
+            lab = cv2.cvtColor(source_image, cv2.COLOR_BGR2LAB)       
+            l, a, b = cv2.split(lab)
+            
+            clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(grid_size, grid_size))
+            cl = clahe.apply(l)
+            enhanced_lab = cv2.merge((cl, a, b))
+            enhanced_image = cv2.cvtColor(enhanced_lab, cv2.COLOR_LAB2BGR)
+            result[i] = torch.from_numpy(enhanced_image.astype(np.float32) / 255.0)
+        return (result,)
+        
