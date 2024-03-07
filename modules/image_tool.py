@@ -2,7 +2,7 @@
 import torch
 import math
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps, ImageDraw
 from .util import tensor2pil, pil2tensor, empty_pil_tensor, crop_image
 import cv2
 
@@ -394,3 +394,91 @@ class OFFCLAHE:
             result[i] = torch.from_numpy(enhanced_image.astype(np.float32) / 255.0)
         return (result,)
         
+class OffGridImageBatch:
+    #from WAS SUITE
+    def __init__(self):
+        pass
+        
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "images": ("IMAGE",),
+                "border_width": ("INT", {"default":20, "min": 0, "max": 100, "step":1}),
+                "number_of_columns": ("INT", {"default":3, "min": 1, "max": 24, "step":1}),
+                "max_cell_size": ("INT", {"default":320, "min":32, "max":2048, "step":1}),
+                "border_red": ("INT", {"default":38, "min": 0, "max": 255, "step":1}),
+                "border_green": ("INT", {"default":38, "min": 0, "max": 255, "step":1}),
+                "border_blue": ("INT", {"default":38, "min": 0, "max": 255, "step":1}),
+                "border_radius": ("INT", {"default":24, "min":0, "max":128,"step":1}), 
+                "target_size": ("INT", {"default":1080,"min":0,"max":8192,"step":8})
+            }
+        }
+        
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "smart_grid_image"
+    
+    CATEGORY = "OFF"
+
+    def smart_grid_image(self, images, number_of_columns=3, max_cell_size=320, border_red=38, border_green=38, border_blue=38, border_width=20, border_radius=24, target_size=1080):
+        
+        cols = number_of_columns
+        border_color = (border_red, border_green, border_blue)
+
+        images_resized = []
+        max_row_height = 0
+        
+        for tensor_img in images:
+            img = tensor2pil(tensor_img)
+            img_w, img_h = img.size
+            aspect_ratio = img_w / img_h
+            
+            if img_w > img_h:
+                cell_w = min(img_w, max_cell_size)
+                cell_h = int(cell_w / aspect_ratio)
+            else:
+                cell_h = min(img_h, max_cell_size)
+                cell_w = int(cell_h * aspect_ratio)
+            
+            img_resized = img.resize((cell_w, cell_h))
+
+            mask = Image.new("L", img_resized.size, 0)
+            draw = ImageDraw.Draw(mask)
+            draw.rounded_rectangle((0,0,cell_w, cell_h),fill=255,radius=border_radius)
+            back_color = Image.new(img_resized.mode, img_resized.size, border_color)
+            img_resized = Image.composite(img_resized, back_color, mask)
+            
+            img_resized = ImageOps.expand(img_resized, border=border_width // 2, fill=border_color)
+
+
+            images_resized.append(img_resized)
+            max_row_height = max(max_row_height, cell_h)
+            
+        max_row_height = int(max_row_height)
+        total_images = len(images_resized)
+        rows = math.ceil(total_images / cols)
+
+        grid_width = cols * max_cell_size + (cols - 1) * border_width
+        grid_height = rows * max_row_height + (rows - 1) * border_width
+        
+        new_image = Image.new('RGB', (grid_width, grid_height), border_color)
+        rand_idx = np.arange(len(images_resized))
+        np.random.shuffle(rand_idx)
+        
+        for i, img in enumerate(images_resized):
+            x = (rand_idx[i] % cols) * (max_cell_size + border_width)
+            y = (rand_idx[i] // cols) * (max_row_height + border_width)
+            
+            img_w, img_h = img.size
+            paste_x = x + (max_cell_size - img_w) // 2
+            paste_y = y + (max_row_height - img_h) // 2
+
+            new_image.paste(img, (paste_x, paste_y, paste_x + img_w, paste_y + img_h))
+
+        new_w, _ = new_image.size
+        outer_border_width = int((target_size - new_w)/2)
+
+        if outer_border_width>0 :
+            new_image = ImageOps.expand(new_image, border=outer_border_width, fill=border_color)
+
+        return (pil2tensor(new_image), )
