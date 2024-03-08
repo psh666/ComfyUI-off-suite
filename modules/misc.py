@@ -1,4 +1,6 @@
 import torch
+import re
+import random
 
 class GWNumFormatter:
 
@@ -73,3 +75,33 @@ class QueryGenderAge:
         faces = model.get(tensorToNP(image[0]))
         print(faces[0].sex, faces[0].age)
         return (faces[0].sex, faces[0].age,)
+
+class RandomSeedFromList:
+    def __init__(self):
+        pass
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required":{
+                "seed_string":("STRING",{}),
+            }
+        }
+    
+    RETURN_TYPES = ("INT",)
+
+    FUNCTION = "execute"
+
+    CATEGORY = "OFF"
+
+    def IS_CHANGED(s, *args, **kwargs):
+        return torch.rand(1).item()
+
+    def execute(self, seed_string):
+        
+        #tokens = re.split(r'[,\s]\s*', seed_string)
+        tokens = seed_string.split(',')
+        seeds = [int(item) for item in tokens]
+
+        seed = random.choice(seeds)
+
+        return (seed,)
