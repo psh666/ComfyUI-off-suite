@@ -482,3 +482,56 @@ class OffGridImageBatch:
             new_image = ImageOps.expand(new_image, border=outer_border_width, fill=border_color)
 
         return (pil2tensor(new_image), )
+    
+class CalcMaskBound:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                    "mask": ("MASK",),
+                    "padding":("INT",{"default":0, "min": 0, "step":1})
+                }
+        }
+    
+    CATEGORY = "OFF"
+
+    RETURN_TYPES = ("INT","INT","INT","INT",)
+    FUNCTION = "process"
+
+    def process(self, mask, padding):
+        
+        rows, cols = np.where(mask[0])
+        min_row, max_row = rows.min(), rows.max()
+        min_col, max_col = cols.min(), cols.max()
+
+        min_col -= padding
+        min_row -= padding
+
+        max_col += padding
+        max_row += padding
+        
+        if min_col< 0 :
+            min_col = 0
+        
+        if min_row<0:
+            min_row = 0
+        
+        if max_row > mask.shape[1]:
+            max_row = mask.shape[1]
+            
+        if max_col > mask.shape[2]:
+            max_col = mask.shape[2]
+            
+
+        return (min_col, min_row, max_col - min_col, max_row - min_row, )
+
+
+                
+
+
+
+
+

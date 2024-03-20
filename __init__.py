@@ -1,5 +1,5 @@
 from .modules.image_loader import CachedLoadImageFromUrl
-from .modules.image_tool import OFFCenterCrop, OFFCenterCropSEGS, OFFSEGSToImage, OFFImageResizeFit, OFFWatermark, MaskToImageFallback, MaskDilationForEachFace, SegsToFaceCropData, PasteFaceSegToImage, OFFCLAHE,OffGridImageBatch
+from .modules.image_tool import OFFCenterCrop, OFFCenterCropSEGS, OFFSEGSToImage, OFFImageResizeFit,OFFWatermark, MaskToImageFallback, MaskDilationForEachFace, SegsToFaceCropData, PasteFaceSegToImage, OFFCLAHE,OffGridImageBatch, CalcMaskBound
 from .modules.misc import GWNumFormatter, QueryGenderAge, RandomSeedFromList
 from .modules.latent_tool import VAEEncodeForInpaintV2
 
@@ -23,7 +23,8 @@ NODE_CLASS_MAPPINGS = {
     "Paste Face Segment to Image" : PasteFaceSegToImage,
     "Apply CLAHE" : OFFCLAHE,
     "Grid Image from batch (OFF)" : OffGridImageBatch,
-    "RandomSeedfromList" : RandomSeedFromList
+    "RandomSeedfromList" : RandomSeedFromList, 
+    "CalcMaskBound":CalcMaskBound
 }
 
 # A dictionary that contains the friendly/humanly readable titles for the nodes
@@ -44,5 +45,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Paste Face Segment to Image":"Paste Face Segment to Image",
     "Apply CLAHE":"Apply CLAHE",
     "Grid Image from batch (OFF)" : "Grid Image from batch (OFF)",
-    "RandomSeedfromList" : "Random Seed from List"
+    "RandomSeedfromList" : "Random Seed from List",
+    "CalcMaskBound": "Calculate mask bound"
 }
