@@ -498,7 +498,7 @@ class CalcMaskBound:
     
     CATEGORY = "OFF"
 
-    RETURN_TYPES = ("INT","INT","INT","INT",)
+    RETURN_TYPES = ("INT","INT","INT","INT","INT","INT",)
     FUNCTION = "process"
 
     def process(self, mask, padding):
@@ -526,7 +526,7 @@ class CalcMaskBound:
             max_col = mask.shape[2]
             
 
-        return (min_col, min_row, max_col - min_col, max_row - min_row, )
+        return (min_col, min_row, max_col - min_col, max_row - min_row, max_col, max_row,)
 
 
                 
