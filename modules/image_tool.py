@@ -492,7 +492,8 @@ class CalcMaskBound:
         return {
             "required": {
                     "mask": ("MASK",),
-                    "padding":("INT",{"default":0, "min": 0, "step":1})
+                    "padding":("INT",{"default":0, "min": 0, "step":1}),
+                    "ratio" : ("FLOAT",{"default":1.0, "min":0.7, "max":1.5, "step":0.1})
                 }
         }
     
@@ -501,7 +502,7 @@ class CalcMaskBound:
     RETURN_TYPES = ("INT","INT","INT","INT","INT","INT",)
     FUNCTION = "process"
 
-    def process(self, mask, padding):
+    def process(self, mask, padding, ratio):
         
         rows, cols = np.where(mask[0])
         min_row, max_row = rows.min(), rows.max()
@@ -524,8 +525,48 @@ class CalcMaskBound:
             
         if max_col > mask.shape[2]:
             max_col = mask.shape[2]
-            
 
+        ori_width = max_col - min_col
+        ori_height = max_row - min_row
+
+        desired_height = max(ori_width, ori_height)
+       
+        desired_width = int(desired_height * ratio)
+
+        shrink_ratio_w = ori_width/desired_width
+        shrink_ratio_h = ori_height/desired_height
+
+        shrink_ratio = max(shrink_ratio_w, shrink_ratio_h)
+
+        desired_width *= shrink_ratio
+        desired_height *= shrink_ratio
+        
+        optional_padding_col = int((desired_width - ori_width) / 2)
+        optional_padding_row = int((desired_height - ori_height)/2)
+
+        min_col -= optional_padding_col
+        min_row -= optional_padding_row
+
+        max_col += optional_padding_col
+        max_row += optional_padding_row
+
+        if min_col < 0 :
+            min_col = 0
+            max_col -= min_col
+        
+        if min_row<0:
+            min_row = 0
+            max_row -= min_row
+        
+        if max_row > mask.shape[1]:
+            min_row -= (mask.shape[1] - max_row)
+            max_row = mask.shape[1]
+            
+            
+        if max_col > mask.shape[2]:
+            min_col -= (mask.shape[1] - max_col)
+            max_col = mask.shape[2]
+           
         return (min_col, min_row, max_col - min_col, max_row - min_row, max_col, max_row,)
 
 
