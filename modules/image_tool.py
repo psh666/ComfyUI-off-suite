@@ -564,7 +564,7 @@ class CalcMaskBound:
             
             
         if max_col > mask.shape[2]:
-            min_col -= (mask.shape[1] - max_col)
+            min_col -= (mask.shape[2] - max_col)
             max_col = mask.shape[2]
            
         return (min_col, min_row, max_col - min_col, max_row - min_row, max_col, max_row,)
