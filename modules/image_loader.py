@@ -67,7 +67,7 @@ def cached_image_load_from_url(url: str):
       etag = cache_metadata[url_hash]
       header['If-None-Match'] = etag
 
-    response = requests.get(url, timeout = 5, headers=header)
+    response = requests.get(url, timeout = 20, headers=header)
 
     if response.status_code == 304:
       print("yeah cached!")
