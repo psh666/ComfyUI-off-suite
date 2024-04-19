@@ -530,17 +530,16 @@ class CalcMaskBound:
         ori_height = max_row - min_row
 
         desired_height = max(ori_width, ori_height)
-       
+        
+        if desired_height > mask.shape[1]:
+            desired_height = mask.shape[1]
+
         desired_width = int(desired_height * ratio)
 
-        shrink_ratio_w = ori_width/desired_width
-        shrink_ratio_h = ori_height/desired_height
+        if desired_width > mask.shape[2]:
+            desired_width = mask.shape[2]
+            desired_height = desired_width / ratio
 
-        shrink_ratio = max(shrink_ratio_w, shrink_ratio_h)
-
-        desired_width *= shrink_ratio
-        desired_height *= shrink_ratio
-        
         optional_padding_col = int((desired_width - ori_width) / 2)
         optional_padding_row = int((desired_height - ori_height)/2)
 
