@@ -93,6 +93,8 @@ def load_images_from_url(urls: List[str], keep_alpha_channel=False):
     images = []
     masks = []
 
+    print("List of urls:", urls)
+
     for url in urls:
         if url.startswith("data:image/"):
             i = Image.open(io.BytesIO(base64.b64decode(url.split(",")[1])))
