@@ -171,7 +171,7 @@ class CachedLoadImageFromUrl:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "url": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
+                "image_url": ("STRING", {"default": "", "multiline": True, "dynamicPrompts": False}),
             },
             "optional": {
                 "keep_alpha_channel": (
@@ -191,8 +191,8 @@ class CachedLoadImageFromUrl:
     CATEGORY = "OFF"
     FUNCTION = "load_image"
 
-    def load_image(self, url: str, keep_alpha_channel=False, output_mode=False):
-        urls = url.strip().split("\n")
+    def load_image(self, image_url: str, keep_alpha_channel=False, output_mode=False):
+        urls = image_url.strip().split("\n")
         images, masks = load_images_from_url(urls, keep_alpha_channel)
         if len(images) == 0:
             image = torch.zeros((1, 64, 64, 3), dtype=torch.float32, device="cpu")
